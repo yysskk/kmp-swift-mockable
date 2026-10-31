@@ -26,11 +26,14 @@ import javax.inject.Inject
  * Writes `@Mockable` Swift protocols mirroring the annotated interfaces of one linked
  * Apple framework.
  *
+ * The task writes [generatedFile], its own output in the build directory, and copies it
+ * to [destinationFile], which every framework of a module shares. The copy reflects the
+ * framework linked last, which is the one the Swift code is about to compile against.
  * The task reads the framework's headers and module map rather than its binary, so
- * relinking without an API change leaves it up to date. It is not cacheable: every
- * framework of a module writes the same file, outside the build directory.
+ * relinking without an API change leaves it up to date, as long as the copy is current.
+ * It is not cacheable, since a cache hit would skip the copy.
  */
-@DisableCachingByDefault(because = "Several tasks write the same file outside the build directory.")
+@DisableCachingByDefault(because = "The task copies its output to a file outside the build directory.")
 public abstract class GenerateSwiftMocks @Inject constructor(
     private val execOperations: ExecOperations,
 ) : DefaultTask() {
@@ -76,13 +79,37 @@ public abstract class GenerateSwiftMocks @Inject constructor(
     @get:PathSensitive(PathSensitivity.NONE)
     public abstract val generatorExecutable: RegularFileProperty
 
-    /** The Swift file to write. */
+    /** The Swift file the generator writes, which belongs to this task alone. */
     @get:OutputFile
-    public abstract val outputFile: RegularFileProperty
+    public abstract val generatedFile: RegularFileProperty
+
+    /** Where the generated file is copied to: `<outputDir>/<FrameworkBaseName>Mocks.swift`. */
+    @get:Internal
+    public abstract val destinationFile: RegularFileProperty
+
+    init {
+        // Another framework's task may have replaced the shared copy since this one ran.
+        outputs.upToDateWhen { task -> (task as GenerateSwiftMocks).isDestinationCurrent() }
+    }
 
     @TaskAction
     internal fun generate() {
         execOperations.exec { it.commandLine(generatorCommandLine()) }
+        copyToDestination()
+    }
+
+    /** Copies the generated file unless the destination already holds it, to keep its date. */
+    internal fun copyToDestination() {
+        if (isDestinationCurrent()) return
+        val destination = destinationFile.get().asFile
+        destination.parentFile.mkdirs()
+        generatedFile.get().asFile.copyTo(destination, overwrite = true)
+    }
+
+    private fun isDestinationCurrent(): Boolean {
+        val generated = generatedFile.get().asFile
+        val destination = destinationFile.get().asFile
+        return generated.isFile && destination.isFile && generated.readBytes().contentEquals(destination.readBytes())
     }
 
     /** The generator's command line for the task's current inputs. */
@@ -100,7 +127,7 @@ public abstract class GenerateSwiftMocks @Inject constructor(
             }
             condition.orNull?.let { addAll(listOf("--condition", it)) }
             addAll(listOf("--access-level", accessLevel.get().swiftKeyword))
-            addAll(listOf("--output", outputFile.get().asFile.absolutePath))
+            addAll(listOf("--output", generatedFile.get().asFile.absolutePath))
         }
     }
 }

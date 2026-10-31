@@ -57,7 +57,11 @@ class PluginConfigurationTest {
         val task = project.generateTask()
         assertEquals("arm64-apple-ios14.0-simulator", task.targetTriple.get())
         assertEquals("iphonesimulator", task.sdk.get())
-        assertEquals(project.file("Generated/SharedMocks.swift"), task.outputFile.get().asFile)
+        assertEquals(project.file("Generated/SharedMocks.swift"), task.destinationFile.get().asFile)
+        assertEquals(
+            project.layout.buildDirectory.file("kmp-swift-mockable/iosSimulatorArm64/debugFramework/SharedMocks.swift").get().asFile,
+            task.generatedFile.get().asFile,
+        )
         assertTrue(task.framework.get().asFile.path.endsWith("bin/iosSimulatorArm64/debugFramework/Shared.framework"))
         assertNotNull(project.tasks.findByName("generateSwiftMocksReleaseFrameworkIosSimulatorArm64"))
 
@@ -76,7 +80,7 @@ class PluginConfigurationTest {
                 "--interfaces", listFile.absolutePath,
                 "--condition", "TESTING",
                 "--access-level", "public",
-                "--output", project.file("Generated/SharedMocks.swift").absolutePath,
+                "--output", task.generatedFile.get().asFile.absolutePath,
             ),
             task.generatorCommandLine(),
         )
@@ -103,6 +107,30 @@ class PluginConfigurationTest {
         val task = multiplatformProject().generateTask()
         val error = assertFailsWith<GradleException> { task.generatorCommandLine() }
         assertTrue(error.message!!.contains("kmpSwiftMockable.generatorExecutable"))
+    }
+
+    @Test
+    fun `the generated file is copied to the destination only when it differs`() {
+        if (!isMacOS) return
+        val task = multiplatformProject {
+            extensions.configure(KmpSwiftMockableExtension::class.java) {
+                it.outputDir.set(layout.projectDirectory.dir("Generated"))
+            }
+        }.generateTask()
+        val generated = task.generatedFile.get().asFile.apply { parentFile.mkdirs(); writeText("one") }
+        val destination = task.destinationFile.get().asFile
+
+        task.copyToDestination()
+        assertEquals("one", destination.readText())
+
+        val modified = destination.lastModified() - 10_000
+        destination.setLastModified(modified)
+        task.copyToDestination()
+        assertEquals(modified, destination.lastModified())
+
+        generated.writeText("two")
+        task.copyToDestination()
+        assertEquals("two", destination.readText())
     }
 
     @Test

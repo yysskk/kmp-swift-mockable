@@ -107,7 +107,10 @@ public class KmpSwiftMockablePlugin : Plugin<Project> {
             task.condition.set(extension.condition)
             task.accessLevel.set(extension.accessLevel)
             task.generatorExecutable.set(extension.generatorExecutable)
-            task.outputFile.set(extension.outputDir.file("${framework.baseName}Mocks.swift"))
+            task.generatedFile.set(
+                project.layout.buildDirectory.file("kmp-swift-mockable/${target.name}/${framework.name}/${framework.baseName}Mocks.swift"),
+            )
+            task.destinationFile.set(extension.outputDir.file("${framework.baseName}Mocks.swift"))
         }
         framework.linkTaskProvider.configure { it.finalizedBy(generate) }
         return generate

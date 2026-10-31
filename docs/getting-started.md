@@ -10,7 +10,7 @@ Apply KSP and the plugin in `shared/build.gradle.kts`, next to the Kotlin Multip
 plugins {
     kotlin("multiplatform") version "2.4.21"
     id("com.google.devtools.ksp") version "2.3.13"
-    id("io.github.yysskk.kmp-swift-mockable") version "<version>"
+    id("io.github.yysskk.kmp-swift-mockable") version "1.0.0"
 }
 
 kotlin {

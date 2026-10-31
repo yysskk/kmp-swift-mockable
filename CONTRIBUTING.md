@@ -16,7 +16,6 @@ project layout, how to build and test, and the conventions we follow.
   - `Tests/KMPSwiftMockableGeneratorTests/` — tests, with interface fixtures
     shaped like real Kotlin/Native output in `Fixtures.swift`. The macOS-only
     tests write a header-only framework and run the interface synthesizer on it.
-
 - `annotations/` — the `@SwiftMockable` annotation, a Kotlin Multiplatform
   library published for every Kotlin target.
 - `ksp/` — the symbol processor that lists annotated interfaces in
@@ -26,6 +25,13 @@ project layout, how to build and test, and the conventions we follow.
   processor, and a generation task for every Apple framework. Its tests apply
   it in-process with `ProjectBuilder`, and run whole builds with Gradle TestKit
   against empty stand-ins for the annotation and processor artifacts.
+- `sample/` — a Kotlin Multiplatform project that applies the plugin from
+  this build, and a Swift package (`sample/swift`) whose tests drive the
+  sample's Kotlin code with the generated mocks.
+
+Each Gradle project is named after the artifact it publishes
+(`:kmp-swift-mockable-annotations`, ...), so that a build including this one,
+such as the sample, uses the projects in place of the published artifacts.
 
 On macOS, the plugin's jar bundles the generator, built by the
 `buildGenerator` task as a stripped universal binary
@@ -33,10 +39,6 @@ On macOS, the plugin's jar bundles the generator, built by the
 host has no generator, and builds using it must set
 `kmpSwiftMockable.generatorExecutable`. The same property runs a generator
 built from a local checkout while working on it.
-
-Each Gradle project is named after the artifact it publishes
-(`:kmp-swift-mockable-annotations`, ...), so that a build including this one
-uses the projects in place of the published artifacts.
 
 ## Building and testing
 
@@ -82,6 +84,18 @@ the project total may drift by 1%, while new and changed lines are expected to
 reach 80%. Pull requests from forks skip the upload, because they cannot read
 the repository's Codecov token; run the script locally to check coverage on
 those.
+
+### Running the sample
+
+```sh
+./gradlew -p sample assembleSharedDebugXCFramework
+swift test --package-path sample/swift
+```
+
+The first command links the framework, which writes
+`sample/swift/Tests/SharedTests/Generated/SharedMocks.swift`. CI compares that
+file with `sample/SharedMocks.swift.expected`; when a change to the generator
+changes the output on purpose, copy the new file over the snapshot.
 
 ## Commit and PR conventions
 

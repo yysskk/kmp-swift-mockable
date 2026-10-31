@@ -17,7 +17,20 @@ project layout, how to build and test, and the conventions we follow.
     shaped like real Kotlin/Native output in `Fixtures.swift`. The macOS-only
     tests write a header-only framework and run the interface synthesizer on it.
 
+- `annotations/` — the `@SwiftMockable` annotation, a Kotlin Multiplatform
+  library published for every Kotlin target.
+
 ## Building and testing
+
+The Kotlin modules build with Gradle and JDK 17 or later:
+
+```sh
+./gradlew check
+```
+
+Apple targets compile only on macOS; on other hosts Gradle skips them.
+
+The Swift generator builds with SwiftPM:
 
 ```sh
 cd swift-generator

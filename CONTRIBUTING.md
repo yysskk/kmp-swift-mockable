@@ -27,6 +27,13 @@ project layout, how to build and test, and the conventions we follow.
   it in-process with `ProjectBuilder`, and run whole builds with Gradle TestKit
   against empty stand-ins for the annotation and processor artifacts.
 
+On macOS, the plugin's jar bundles the generator, built by the
+`buildGenerator` task as a stripped universal binary
+(`swift build -c release --arch arm64 --arch x86_64`). A jar built on another
+host has no generator, and builds using it must set
+`kmpSwiftMockable.generatorExecutable`. The same property runs a generator
+built from a local checkout while working on it.
+
 Each Gradle project is named after the artifact it publishes
 (`:kmp-swift-mockable-annotations`, ...), so that a build including this one
 uses the projects in place of the published artifacts.

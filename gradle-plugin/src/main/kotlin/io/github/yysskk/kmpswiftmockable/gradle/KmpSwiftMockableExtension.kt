@@ -31,6 +31,9 @@ public abstract class KmpSwiftMockableExtension {
     /** The access level of the generated protocols and their mocks. Defaults to [SwiftAccessLevel.INTERNAL]. */
     public abstract val accessLevel: Property<SwiftAccessLevel>
 
-    /** The `kmp-swift-mockable-generator` executable to run. */
+    /**
+     * A `kmp-swift-mockable-generator` executable to run instead of the one bundled
+     * with the plugin, for example one built from a local checkout.
+     */
     public abstract val generatorExecutable: RegularFileProperty
 }

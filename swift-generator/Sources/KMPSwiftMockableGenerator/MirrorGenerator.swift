@@ -87,11 +87,17 @@ package struct MirrorGenerator {
     }
 
     /// The protocol's requirements followed by those of every protocol it inherits,
-    /// depth first, each restated once.
+    /// depth first, each restated once. Each protocol is visited once, so a protocol
+    /// inherited along several paths, or an interface that is not valid Swift and
+    /// inherits itself, cannot make the walk repeat or recurse forever.
     private func allRequirements(of declaration: ProtocolDeclaration) -> [RestatedRequirement] {
+        var visited = Set<String>()
         var seen = Set<String>()
         var result: [RestatedRequirement] = []
         func visit(_ declaration: ProtocolDeclaration) {
+            guard visited.insert(declaration.name).inserted else {
+                return
+            }
             for requirement in declaration.requirements {
                 let restated = RestatedRequirement(requirement)
                 if seen.insert(restated.key).inserted {

@@ -34,7 +34,8 @@ let package = Package(
         ),
         .testTarget(
             name: "KMPSwiftMockableGeneratorTests",
-            dependencies: ["KMPSwiftMockableGenerator"]
+            dependencies: ["KMPSwiftMockableGenerator"],
+            resources: [.copy("Resources")]
         ),
     ]
 )

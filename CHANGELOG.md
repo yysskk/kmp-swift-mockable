@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-31
+
+The first release. It requires swift-mockable 4.0 or later, which treats a module-qualified parent protocol as a conformance.
+
 ### Added
 
 - `swift-generator`, a Swift package that reads the protocols of a Kotlin/Native framework from its synthesized Swift interface. A `suspend` function's completion-handler requirement is dropped when Swift also imports it as `async`, since both name the same Objective-C method.
@@ -17,3 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `io.github.yysskk.kmp-swift-mockable` Gradle plugin. Applied next to the Kotlin Multiplatform and KSP plugins, it adds the annotation and the symbol processor, and generates `<FrameworkName>Mocks.swift` after each Apple framework links. `kmpSwiftMockable { outputDir; condition; accessLevel }` configures the file, and `generateSwiftMocks` generates it from the host simulator's debug framework.
 - The plugin's jar bundles the generator as a universal macOS binary, extracted on first use to the Gradle user home. `kmpSwiftMockable.generatorExecutable` runs another build of it instead.
 - A release workflow that publishes the annotation and the processor to Maven Central, and the plugin to the Gradle Plugin Portal, when a version tag is pushed.
+
+[Unreleased]: https://github.com/yysskk/kmp-swift-mockable/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/yysskk/kmp-swift-mockable/releases/tag/v1.0.0

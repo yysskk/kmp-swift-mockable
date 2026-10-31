@@ -58,7 +58,7 @@ In the Kotlin Multiplatform module that builds the Apple framework, apply KSP an
 plugins {
     kotlin("multiplatform")
     id("com.google.devtools.ksp") version "<KSP version for your Kotlin version>"
-    id("io.github.yysskk.kmp-swift-mockable") version "<version>"
+    id("io.github.yysskk.kmp-swift-mockable") version "1.0.0"
 }
 
 kmpSwiftMockable {

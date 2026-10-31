@@ -2,5 +2,5 @@
 /// header of every generated file.
 package enum GeneratorVersion {
     /// The current version, kept in step with `VERSION_NAME` in `gradle.properties`.
-    package static let current = "0.1.0"
+    package static let current = "1.0.0"
 }

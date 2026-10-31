@@ -1,0 +1,12 @@
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- `swift-generator`, a Swift package that reads the protocols of a Kotlin/Native framework from its synthesized Swift interface. A `suspend` function's completion-handler requirement is dropped when Swift also imports it as `async`, since both name the same Objective-C method.

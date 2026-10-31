@@ -76,6 +76,38 @@ struct ModuleInterfaceTests {
         #expect(try requirements(of: "Tracker", in: source).count == 2)
     }
 
+    @Test("A completion handler is not paired with an async function taking other parameter types")
+    func pairingComparesParameterTypes() throws {
+        let source = """
+            public protocol Store {
+                func put(value: Swift.String, completionHandler: @escaping @Sendable ((any Swift.Error)?) -> Swift.Void)
+                func put(value: Swift.Int32) async throws
+            }
+            """
+        #expect(try requirements(of: "Store", in: source).count == 2)
+    }
+
+    @Test("Protocols and requirements in every branch of an #if block are read")
+    func readsConditionalDeclarations() throws {
+        let source = """
+            #if os(iOS)
+            public protocol Camera {
+                func capture()
+            }
+            #else
+            public protocol Screen {
+                #if DEBUG
+                func dump()
+                #endif
+                func refresh()
+            }
+            #endif
+            """
+        let interface = ModuleInterface(source: source)
+        #expect(interface.protocols.map(\.name) == ["Camera", "Screen"])
+        #expect(try requirements(of: "Screen", in: source) == ["func dump()", "func refresh()"])
+    }
+
     @Test("Attributes and comments are removed from requirements")
     func stripsAttributesAndComments() throws {
         let source = """

@@ -9,14 +9,34 @@ import SwiftSyntax
 /// translated: Kotlin types are mapped, names are disambiguated, and every `suspend`
 /// function appears twice, once taking a completion handler and once `async`.
 package struct ModuleInterface {
-    /// The protocols declared at the top level of the interface, in source order.
+    /// The protocols declared at the top level of the interface, in source order,
+    /// including those in every branch of an `#if` block.
     package let protocols: [ProtocolDeclaration]
 
     /// Parses the text of a synthesized module interface.
     package init(source: String) {
         let file = Parser.parse(source: source)
-        protocols = file.statements.compactMap { statement in
-            statement.item.as(ProtocolDeclSyntax.self).map(ProtocolDeclaration.init)
+        protocols = file.statements.flatMap { statement in
+            Self.flattened(statement.item).compactMap { $0.as(ProtocolDeclSyntax.self).map(ProtocolDeclaration.init) }
+        }
+    }
+
+    /// The node itself, or the declarations in every branch of an `#if` block. Which
+    /// branch is active depends on build settings the generator does not know, and a
+    /// synthesized interface has no `#if` blocks of its own, so all of them are read.
+    static func flattened(_ node: some SyntaxProtocol) -> [Syntax] {
+        guard let ifConfig = node.as(IfConfigDeclSyntax.self) else {
+            return [Syntax(node)]
+        }
+        return ifConfig.clauses.flatMap { clause -> [Syntax] in
+            switch clause.elements {
+            case .statements(let statements):
+                statements.flatMap { flattened($0.item) }
+            case .decls(let members):
+                members.flatMap { flattened($0.decl) }
+            default:
+                []
+            }
         }
     }
 
@@ -42,7 +62,9 @@ package struct ProtocolDeclaration {
         name = decl.name.text
         inheritedTypes = decl.inheritanceClause?.inheritedTypes.map(\.type.trimmedDescription) ?? []
 
-        let members = decl.memberBlock.members.compactMap { Requirement($0.decl) }
+        let members = decl.memberBlock.members
+            .flatMap { ModuleInterface.flattened($0.decl) }
+            .compactMap { $0.as(DeclSyntax.self).flatMap(Requirement.init) }
         let asyncSignatures = Set(members.lazy.filter(\.isAsync).map(\.selectorSignature))
         requirements = members.filter { member in
             guard let signature = member.completionHandlerAsyncSignature else {
@@ -78,7 +100,7 @@ package struct Requirement {
         declaration.as(FunctionDeclSyntax.self)?.signature.effectSpecifiers?.asyncSpecifier != nil
     }
 
-    /// The base name and argument labels, e.g. `fetchUser(id:)`.
+    /// The base name, argument labels, and parameter types, e.g. `fetchUser(id:Swift.Int32)`.
     var selectorSignature: String {
         guard let function = declaration.as(FunctionDeclSyntax.self) else {
             return name
@@ -88,7 +110,7 @@ package struct Requirement {
 
     /// For a function whose last parameter is a Kotlin/Native completion handler, the
     /// signature of the `async` function Swift imports for the same method: the same
-    /// base name and labels without the completion handler. `nil` for any other
+    /// base name and parameters without the completion handler. `nil` for any other
     /// requirement.
     var completionHandlerAsyncSignature: String? {
         guard let function = declaration.as(FunctionDeclSyntax.self),
@@ -147,7 +169,7 @@ package struct Requirement {
     }
 
     private static func signature(name: String, parameters: [FunctionParameterSyntax]) -> String {
-        let labels = parameters.map { "\($0.firstName.text):" }.joined()
-        return "\(name)(\(labels))"
+        let parameters = parameters.map { "\($0.firstName.text):\($0.type.trimmedDescription)" }
+        return "\(name)(\(parameters.joined(separator: ",")))"
     }
 }

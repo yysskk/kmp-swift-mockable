@@ -6,7 +6,8 @@ plugins {
 
 // Coverage of the JVM modules, merged into build/reports/kover/report.xml.
 dependencies {
-    kover(project(":ksp"))
+    kover(project(":kmp-swift-mockable-ksp"))
+    kover(project(":kmp-swift-mockable-gradle-plugin"))
 }
 
 allprojects {

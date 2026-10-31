@@ -6,6 +6,7 @@ plugins {
     `java-gradle-plugin`
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kover)
+    alias(libs.plugins.plugin.publish)
 }
 
 kotlin {
@@ -20,12 +21,15 @@ kotlin {
 }
 
 gradlePlugin {
+    website = "https://github.com/yysskk/kmp-swift-mockable"
+    vcsUrl = "https://github.com/yysskk/kmp-swift-mockable"
     plugins {
         create("kmpSwiftMockable") {
             id = "io.github.yysskk.kmp-swift-mockable"
             implementationClass = "io.github.yysskk.kmpswiftmockable.gradle.KmpSwiftMockablePlugin"
             displayName = "kmp-swift-mockable"
             description = "Generates Swift mocks of Kotlin Multiplatform interfaces with swift-mockable."
+            tags = listOf("kotlin-multiplatform", "swift", "ios", "testing", "mock")
         }
     }
 }

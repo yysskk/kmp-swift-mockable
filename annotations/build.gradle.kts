@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.maven.publish)
 }
 
 // The annotation is applied in common code, so it is published for every target a
@@ -44,4 +45,17 @@ kotlin {
     androidNativeArm64()
     androidNativeX64()
     androidNativeX86()
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    // Release builds sign with the key CI passes as signingInMemoryKey; local
+    // publishing to Maven Local works without one.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
+    }
+    pom {
+        name = "kmp-swift-mockable annotations"
+        description = "The @SwiftMockable annotation, which marks Kotlin interfaces to generate Swift mocks for."
+    }
 }

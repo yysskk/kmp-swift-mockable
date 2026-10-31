@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kover)
+    alias(libs.plugins.maven.publish) apply false
 }
 
 // Coverage of the JVM modules, merged into build/reports/kover/report.xml.

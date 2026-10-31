@@ -1,13 +1,11 @@
 package io.github.yysskk.kmpswiftmockable.gradle
 
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -102,11 +100,14 @@ class PluginConfigurationTest {
     }
 
     @Test
-    fun `running without a generator is an error`() {
+    fun `the bundled generator is extracted to the Gradle user home when none is set`() {
         if (!isMacOS) return
         val task = multiplatformProject().generateTask()
-        val error = assertFailsWith<GradleException> { task.generatorCommandLine() }
-        assertTrue(error.message!!.contains("kmpSwiftMockable.generatorExecutable"))
+        assertEquals(
+            task.project.gradle.gradleUserHomeDir.resolve("caches/kmp-swift-mockable/generator"),
+            task.generatorCacheDirectory.get().asFile,
+        )
+        assertEquals(System.getProperty("pluginVersion"), task.pluginVersion.get())
     }
 
     @Test

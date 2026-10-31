@@ -9,7 +9,6 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class KmpSwiftMockablePluginTest {
     private val projectDir: File = Files.createTempDirectory("kmp-swift-mockable").toFile()
@@ -181,26 +180,5 @@ class KmpSwiftMockablePluginTest {
 
         val second = build("generateSwiftMocks", "--dry-run", "--configuration-cache").output
         assertContains(second, "Configuration cache entry reused")
-    }
-
-    @Test
-    fun `the generator must be configured before a task runs`() {
-        if (!isMacOS) return
-        writeProject(
-            """
-                id("org.jetbrains.kotlin.multiplatform")
-                id("com.google.devtools.ksp")
-                id("io.github.yysskk.kmp-swift-mockable")
-            """,
-            multiplatformProject,
-        )
-        val framework = projectDir.resolve("build/bin/iosSimulatorArm64/debugFramework/Shared.framework")
-        framework.resolve("Headers").mkdirs()
-        framework.resolve("Modules").mkdirs()
-
-        val result = runner("generateSwiftMocksDebugFrameworkIosSimulatorArm64", "-x", "linkDebugFrameworkIosSimulatorArm64", "-x", "kspKotlinIosSimulatorArm64")
-            .buildAndFail()
-        assertContains(result.output, "kmp-swift-mockable has no generator to run")
-        assertTrue(projectDir.resolve("Generated").listFiles().isNullOrEmpty())
     }
 }

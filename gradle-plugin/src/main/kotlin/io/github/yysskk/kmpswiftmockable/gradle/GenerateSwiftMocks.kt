@@ -1,7 +1,6 @@
 package io.github.yysskk.kmpswiftmockable.gradle
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
@@ -26,6 +25,7 @@ import javax.inject.Inject
  * Writes `@Mockable` Swift protocols mirroring the annotated interfaces of one linked
  * Apple framework.
  *
+ * The generator is the one bundled with the plugin unless [generatorExecutable] is set.
  * The task writes [generatedFile], its own output in the build directory, and copies it
  * to [destinationFile], which every framework of a module shares. The copy reflects the
  * framework linked last, which is the one the Swift code is about to compile against.
@@ -73,11 +73,19 @@ public abstract class GenerateSwiftMocks @Inject constructor(
     @get:Input
     public abstract val accessLevel: Property<SwiftAccessLevel>
 
-    /** The generator to run. */
+    /** The generator to run instead of the one bundled with the plugin. */
     @get:InputFile
     @get:Optional
     @get:PathSensitive(PathSensitivity.NONE)
     public abstract val generatorExecutable: RegularFileProperty
+
+    /** The plugin's version, which identifies the bundled generator. */
+    @get:Input
+    public abstract val pluginVersion: Property<String>
+
+    /** Where the bundled generator is extracted to. */
+    @get:Internal
+    public abstract val generatorCacheDirectory: DirectoryProperty
 
     /** The Swift file the generator writes, which belongs to this task alone. */
     @get:OutputFile
@@ -114,9 +122,8 @@ public abstract class GenerateSwiftMocks @Inject constructor(
 
     /** The generator's command line for the task's current inputs. */
     internal fun generatorCommandLine(): List<String> {
-        val generator = generatorExecutable.orNull?.asFile ?: throw GradleException(
-            "kmp-swift-mockable has no generator to run. Set kmpSwiftMockable.generatorExecutable.",
-        )
+        val generator = generatorExecutable.orNull?.asFile
+            ?: BundledGenerator.extract(generatorCacheDirectory.get().asFile)
         return buildList {
             add(generator.absolutePath)
             addAll(listOf("--framework", framework.get().asFile.absolutePath))

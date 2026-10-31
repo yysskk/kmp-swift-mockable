@@ -107,6 +107,10 @@ public class KmpSwiftMockablePlugin : Plugin<Project> {
             task.condition.set(extension.condition)
             task.accessLevel.set(extension.accessLevel)
             task.generatorExecutable.set(extension.generatorExecutable)
+            task.pluginVersion.set(version)
+            task.generatorCacheDirectory.set(
+                project.gradle.gradleUserHomeDir.resolve("caches/kmp-swift-mockable/generator"),
+            )
             task.generatedFile.set(
                 project.layout.buildDirectory.file("kmp-swift-mockable/${target.name}/${framework.name}/${framework.baseName}Mocks.swift"),
             )

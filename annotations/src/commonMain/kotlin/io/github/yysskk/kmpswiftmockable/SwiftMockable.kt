@@ -22,7 +22,9 @@ package io.github.yysskk.kmpswiftmockable
  * ```
  *
  * The interface must be declared in the module that builds the Apple framework.
- * Applying the annotation to anything other than an interface is a compile error.
+ * Kotlin has no annotation target for interfaces alone, so the annotation compiles on
+ * any class; the plugin's symbol processor reports an error for anything other than an
+ * interface.
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)

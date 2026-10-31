@@ -97,6 +97,17 @@ The first command links the framework, which writes
 file with `sample/SharedMocks.swift.expected`; when a change to the generator
 changes the output on purpose, copy the new file over the snapshot.
 
+## Keeping documentation in sync
+
+When a change affects the generated output or user-facing behavior, update
+these together so they don't drift:
+
+- `README.md`
+- the guides in `docs/`
+- `llms.txt` and `llms-full.txt`, which restates the README and the guides in
+  one file
+- `CHANGELOG.md`
+
 ## Commit and PR conventions
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for commit

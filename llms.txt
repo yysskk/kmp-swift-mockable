@@ -1,0 +1,58 @@
+# kmp-swift-mockable
+
+> Generates Swift mocks of Kotlin Multiplatform interfaces for iOS tests. A Gradle plugin writes a swift-mockable `@Mockable` protocol that mirrors each Kotlin interface annotated with `@SwiftMockable`, and swift-mockable expands it into `<Name>Mock`. MIT licensed.
+
+Annotate a Kotlin interface in the module that builds the Apple framework:
+
+```kotlin
+@SwiftMockable
+interface UserRepository {
+    suspend fun fetchUser(id: Int): User
+}
+```
+
+Apply the plugin next to Kotlin Multiplatform and KSP, and set where the Swift file goes:
+
+```kotlin
+plugins {
+    kotlin("multiplatform")
+    id("com.google.devtools.ksp")
+    id("io.github.yysskk.kmp-swift-mockable")
+}
+
+kmpSwiftMockable {
+    outputDir = file("../iosApp/iosAppTests/Generated")
+}
+```
+
+Every framework link then writes `<FrameworkBaseName>Mocks.swift`, which the iOS test target compiles with swift-mockable:
+
+```swift
+let repository = UserRepositoryMock()
+repository.fetchUserHandler = { id in User(id: id, name: "Alice") }
+let viewModel = UserViewModel(repository: repository)  // Kotlin code
+```
+
+Key facts:
+
+- Plugin ID `io.github.yysskk.kmp-swift-mockable` (Gradle Plugin Portal). It adds `io.github.yysskk:kmp-swift-mockable-annotations` to `commonMain` and `io.github.yysskk:kmp-swift-mockable-ksp` to every Apple target's KSP configuration. KSP must be applied by the build.
+- Requires Kotlin 2.4+, KSP 2.3+, Gradle 8.13+ with JDK 17+, Xcode 26+ (for `swift-synthesize-interface`), swift-mockable 4.0+.
+- Generation runs on macOS only, after each Apple framework links; `./gradlew :shared:generateSwiftMocks` runs it by hand.
+- Options: `outputDir`, `condition` (passed to `@Mockable(condition:)`), `accessLevel` (`SwiftAccessLevel.INTERNAL`/`PACKAGE`/`PUBLIC`), `generatorExecutable`.
+- A mirror refines the exported protocol (`protocol UserRepository: Shared.UserRepository`), lists at most one mirrored parent so the mock subclasses its mock, and restates every other parent's requirements. A `suspend` function is restated once, as `async throws`.
+- Types keep their module qualifier (`Shared.User`); only `Swift.` is dropped. In tests, `UserRepository` is the mirror and `Shared.UserRepository` the Kotlin interface.
+- Not supported yet: interfaces from other modules, Kotlin Swift export, SKIE.
+
+## Docs
+
+- [README](https://github.com/yysskk/kmp-swift-mockable/blob/main/README.md): overview, setup, configuration, generated output, limitations
+- [Getting started](https://github.com/yysskk/kmp-swift-mockable/blob/main/docs/getting-started.md): Xcode app and Swift package setups
+- [Configuration](https://github.com/yysskk/kmp-swift-mockable/blob/main/docs/configuration.md): options, tasks, added dependencies, generator command line
+- [How it works](https://github.com/yysskk/kmp-swift-mockable/blob/main/docs/how-it-works.md): build steps and design decisions
+- [Limitations](https://github.com/yysskk/kmp-swift-mockable/blob/main/docs/limitations.md)
+- [Full documentation in one file](https://github.com/yysskk/kmp-swift-mockable/blob/main/llms-full.txt)
+
+## Optional
+
+- [swift-mockable](https://github.com/yysskk/swift-mockable): the macro that generates the mocks
+- [Sample project](https://github.com/yysskk/kmp-swift-mockable/tree/main/sample)

@@ -14,5 +14,5 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.ksp.api)
     testImplementation(libs.kotlin.compile.testing.ksp)
-    testImplementation(project(":annotations"))
+    testImplementation(project(":kmp-swift-mockable-annotations"))
 }

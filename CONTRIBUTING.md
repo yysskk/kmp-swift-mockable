@@ -22,6 +22,14 @@ project layout, how to build and test, and the conventions we follow.
 - `ksp/` — the symbol processor that lists annotated interfaces in
   `kmp-swift-mockable/interfaces.json` for the generator. Its tests compile
   sources with [kotlin-compile-testing](https://github.com/ZacSweers/kotlin-compile-testing).
+- `gradle-plugin/` — the Gradle plugin that wires the annotation, the
+  processor, and a generation task for every Apple framework. Its tests apply
+  it in-process with `ProjectBuilder`, and run whole builds with Gradle TestKit
+  against empty stand-ins for the annotation and processor artifacts.
+
+Each Gradle project is named after the artifact it publishes
+(`:kmp-swift-mockable-annotations`, ...), so that a build including this one
+uses the projects in place of the published artifacts.
 
 ## Building and testing
 

@@ -9,7 +9,8 @@ project layout, how to build and test, and the conventions we follow.
   framework's synthesized Swift interface and writes `@Mockable` mirror
   protocols.
   - `Sources/KMPSwiftMockableGenerator/` — the library: `ModuleInterface` reads
-    protocols from a synthesized interface.
+    protocols from a synthesized interface, and `MirrorGenerator` writes the
+    mirror protocols.
   - `Sources/kmp-swift-mockable-generator/` — the command-line tool.
   - `Tests/KMPSwiftMockableGeneratorTests/` — tests, with interface fixtures
     shaped like real Kotlin/Native output in `Fixtures.swift`.

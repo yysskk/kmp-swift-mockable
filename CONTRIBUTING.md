@@ -14,9 +14,8 @@ project layout, how to build and test, and the conventions we follow.
   - `Sources/kmp-swift-mockable-generator/` — the command-line tool. Run
     `swift run kmp-swift-mockable-generator --help` for its options.
   - `Tests/KMPSwiftMockableGeneratorTests/` — tests, with interface fixtures
-    shaped like real Kotlin/Native output in `Fixtures.swift`, and a
-    header-only framework in `Resources/` that the macOS-only tests run the
-    interface synthesizer on.
+    shaped like real Kotlin/Native output in `Fixtures.swift`. The macOS-only
+    tests write a header-only framework and run the interface synthesizer on it.
 
 ## Building and testing
 

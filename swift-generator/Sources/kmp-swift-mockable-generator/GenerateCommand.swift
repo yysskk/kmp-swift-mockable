@@ -62,6 +62,9 @@ struct GenerateCommand: ParsableCommand {
             guard module != nil else {
                 throw ValidationError("--interface-file needs --module.")
             }
+            guard target == nil, sdk == nil else {
+                throw ValidationError("--target and --sdk apply to --framework only.")
+            }
         }
     }
 

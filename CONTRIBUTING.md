@@ -108,6 +108,40 @@ these together so they don't drift:
   one file
 - `CHANGELOG.md`
 
+## Releasing
+
+Pushing a tag `v<version>` runs `.github/workflows/release.yml` on macOS. It
+checks that the tag matches `VERSION_NAME` in `gradle.properties`, runs the
+tests, and publishes:
+
+- `io.github.yysskk:kmp-swift-mockable-annotations` and
+  `io.github.yysskk:kmp-swift-mockable-ksp` to Maven Central, signed;
+- the `io.github.yysskk.kmp-swift-mockable` plugin, with the generator bundled
+  in its jar, to the Gradle Plugin Portal;
+- a GitHub release whose notes are the version's section of `CHANGELOG.md`.
+
+The workflow needs these repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD` | A user token from the [Central Portal](https://central.sonatype.com/) account that owns the `io.github.yysskk` namespace. |
+| `SIGNING_IN_MEMORY_KEY` | The ASCII-armored private GPG key that signs the artifacts (`gpg --armor --export-secret-keys <key id>`), with its public key on a keyserver. |
+| `SIGNING_IN_MEMORY_KEY_PASSWORD` | The key's passphrase. |
+| `GRADLE_PUBLISH_KEY`, `GRADLE_PUBLISH_SECRET` | An API key from the [Gradle Plugin Portal](https://plugins.gradle.org/) account. |
+
+To release:
+
+1. In a pull request, set `VERSION_NAME`, the generator's
+   `GeneratorVersion.current`, and the header of
+   `sample/SharedMocks.swift.expected` to the new version, and move the
+   `Unreleased` entries of `CHANGELOG.md` under a heading for it.
+2. Once it is merged, tag the merge commit and push the tag:
+
+   ```sh
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
 ## Commit and PR conventions
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for commit

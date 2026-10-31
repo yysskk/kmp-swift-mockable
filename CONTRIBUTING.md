@@ -11,9 +11,11 @@ project layout, how to build and test, and the conventions we follow.
   - `Sources/KMPSwiftMockableGenerator/` — the library: `ModuleInterface` reads
     protocols from a synthesized interface, and `MirrorGenerator` writes the
     mirror protocols.
-  - `Sources/kmp-swift-mockable-generator/` — the command-line tool.
+  - `Sources/kmp-swift-mockable-generator/` — the command-line tool. Run
+    `swift run kmp-swift-mockable-generator --help` for its options.
   - `Tests/KMPSwiftMockableGeneratorTests/` — tests, with interface fixtures
-    shaped like real Kotlin/Native output in `Fixtures.swift`.
+    shaped like real Kotlin/Native output in `Fixtures.swift`. The macOS-only
+    tests write a header-only framework and run the interface synthesizer on it.
 
 ## Building and testing
 
@@ -24,7 +26,8 @@ swift test
 ```
 
 Tests use [swift-testing](https://github.com/swiftlang/swift-testing) (`@Test` /
-`#expect`), which ships with the Swift toolchain. The generator only parses and
+`#expect`), which ships with the Swift toolchain. Apart from running
+`swift-synthesize-interface`, which needs Xcode, the generator only parses and
 prints Swift source, so its tests run on Linux as well as macOS.
 
 ### Code coverage

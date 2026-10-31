@@ -134,6 +134,25 @@ struct MirrorGeneratorTests {
             """)
     }
 
+    @Test("Cyclic inheritance in an invalid interface terminates")
+    func cyclicInheritance() {
+        let source = """
+            public protocol Ping : Shared.Pong {
+                func ping()
+            }
+            public protocol Pong : Shared.Ping {
+                func pong()
+            }
+            """
+        let file = generate(["Ping"], from: source)
+        #expect(file.source.contains("""
+            protocol Ping: Shared.Ping {
+                func ping()
+                func pong()
+            }
+            """))
+    }
+
     @Test("Only the Swift qualifier is removed, including inside generic arguments")
     func removesOnlySwiftQualifier() {
         let source = """

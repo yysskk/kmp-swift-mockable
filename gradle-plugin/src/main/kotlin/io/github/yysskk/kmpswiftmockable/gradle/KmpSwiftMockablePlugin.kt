@@ -96,7 +96,7 @@ public class KmpSwiftMockablePlugin : Plugin<Project> {
             task.description = "Generates Swift mocks from the ${framework.name} of ${target.name}."
             task.dependsOn(framework.linkTaskProvider)
             task.dependsOn(project.tasks.matching { it.name == kspTaskName })
-            task.framework.fileProvider(framework.linkTaskProvider.map { framework.outputFile })
+            task.framework.fileProvider(framework.linkTaskProvider.flatMap { it.outputFile })
             task.interfaceLists.from(
                 project.layout.buildDirectory.file(
                     "generated/ksp/${target.name}/${target.name}Main/resources/kmp-swift-mockable/interfaces.json",

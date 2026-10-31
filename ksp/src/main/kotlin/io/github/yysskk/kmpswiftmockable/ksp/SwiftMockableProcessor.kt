@@ -31,11 +31,13 @@ public class SwiftMockableProcessor(
 ) : SymbolProcessor {
     private val interfaces = mutableListOf<InterfaceEntry>()
     private val sources = mutableSetOf<KSFile>()
+    private var reportedErrors = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         for (symbol in resolver.getSymbolsWithAnnotation(ANNOTATION_NAME)) {
             if (symbol !is KSClassDeclaration || symbol.classKind != ClassKind.INTERFACE) {
                 logger.error("@SwiftMockable can only be applied to interfaces.", symbol)
+                reportedErrors = true
                 continue
             }
             interfaces += InterfaceEntry(
@@ -48,6 +50,8 @@ public class SwiftMockableProcessor(
     }
 
     override fun finish() {
+        // The compilation fails anyway; a partial list would only hide the error's cause.
+        if (reportedErrors) return
         val dependencies = Dependencies(aggregating = true, *sources.toTypedArray())
         codeGenerator.createNewFileByPath(dependencies, INTERFACE_LIST_PATH, "json").use { stream ->
             stream.write(InterfaceEntry.listJson(interfaces).toByteArray())

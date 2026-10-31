@@ -8,7 +8,7 @@ import com.tschuchort.compiletesting.kspSourcesDir
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCompilerApi::class)
@@ -106,6 +106,37 @@ class SwiftMockableProcessorTest {
     }
 
     @Test
+    fun `a renamed nested interface keeps its outer prefix unless the name is exact`() {
+        val outcome = process(
+            """
+            package com.example
+
+            import io.github.yysskk.kmpswiftmockable.SwiftMockable
+            import kotlin.native.ObjCName
+
+            class Screen {
+                @SwiftMockable
+                @ObjCName(swiftName = "Renamed")
+                interface Named
+
+                @SwiftMockable
+                @ObjCName("ObjcOnly")
+                interface ObjcNamed
+
+                @SwiftMockable
+                @ObjCName("ExactObjc", swiftName = "ExactName", exact = true)
+                interface Exact
+            }
+            """,
+        )
+
+        val list = outcome.interfaceList.orEmpty()
+        assertTrue(list.contains(""""swiftName": "ScreenRenamed""""), list)
+        assertTrue(list.contains(""""swiftName": "ScreenObjcOnly""""), list)
+        assertTrue(list.contains(""""swiftName": "ExactName""""), list)
+    }
+
+    @Test
     fun `an empty list is written when nothing is annotated`() {
         val outcome = process("package com.example\n\ninterface Plain\n")
 
@@ -128,6 +159,6 @@ class SwiftMockableProcessorTest {
 
         assertEquals(KotlinCompilation.ExitCode.COMPILATION_ERROR, outcome.result.exitCode)
         assertTrue(outcome.result.messages.contains("@SwiftMockable can only be applied to interfaces."))
-        assertFalse(outcome.interfaceList.orEmpty().contains("UserRepository"))
+        assertNull(outcome.interfaceList)
     }
 }

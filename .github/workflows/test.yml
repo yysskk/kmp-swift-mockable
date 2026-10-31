@@ -91,7 +91,18 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       - name: Check
-        run: ./gradlew check
+        run: ./gradlew check koverXmlReport
+
+      # The JVM modules run the same tests on both hosts, so one upload is enough.
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: build/reports/kover/report.xml
+          flags: kotlin
+          disable_search: true
+          fail_ci_if_error: true
 
   test:
     runs-on: ubuntu-latest

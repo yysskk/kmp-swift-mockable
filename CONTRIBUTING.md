@@ -19,6 +19,9 @@ project layout, how to build and test, and the conventions we follow.
 
 - `annotations/` — the `@SwiftMockable` annotation, a Kotlin Multiplatform
   library published for every Kotlin target.
+- `ksp/` — the symbol processor that lists annotated interfaces in
+  `kmp-swift-mockable/interfaces.json` for the generator. Its tests compile
+  sources with [kotlin-compile-testing](https://github.com/ZacSweers/kotlin-compile-testing).
 
 ## Building and testing
 
@@ -29,6 +32,9 @@ The Kotlin modules build with Gradle and JDK 17 or later:
 ```
 
 Apple targets compile only on macOS; on other hosts Gradle skips them.
+`./gradlew koverXmlReport` writes the JVM modules' coverage to
+`build/reports/kover/report.xml`, which CI uploads to Codecov next to the
+generator's report.
 
 The Swift generator builds with SwiftPM:
 

@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 rootProject.name = "kmp-swift-mockable"
 
 include(":annotations")
+include(":ksp")

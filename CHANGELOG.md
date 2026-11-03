@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2026-10-31
+## [1.0.0] - 2026-11-03
 
-The first release. It requires swift-mockable 4.0 or later, which treats a module-qualified parent protocol as a conformance.
+The first release. It requires swift-mockable 3.1 or later, which treats a module-qualified parent protocol as a conformance.
 
 ### Added
 

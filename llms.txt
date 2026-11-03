@@ -36,7 +36,7 @@ let viewModel = UserViewModel(repository: repository)  // Kotlin code
 Key facts:
 
 - Plugin ID `io.github.yysskk.kmp-swift-mockable` (Gradle Plugin Portal). It adds `io.github.yysskk:kmp-swift-mockable-annotations` to `commonMain` and `io.github.yysskk:kmp-swift-mockable-ksp` to every Apple target's KSP configuration. KSP must be applied by the build.
-- Requires Kotlin 2.4+, KSP 2.3+, Gradle 8.13+ with JDK 17+, Xcode 26+ (for `swift-synthesize-interface`), swift-mockable 4.0+.
+- Requires Kotlin 2.4+, KSP 2.3+, Gradle 8.13+ with JDK 17+, Xcode 26+ (for `swift-synthesize-interface`), swift-mockable 3.1+.
 - Generation runs on macOS only, after each Apple framework links; `./gradlew :shared:generateSwiftMocks` runs it by hand.
 - Options: `outputDir`, `condition` (passed to `@Mockable(condition:)`), `accessLevel` (`SwiftAccessLevel.INTERNAL`/`PACKAGE`/`PUBLIC`), `generatorExecutable`.
 - A mirror refines the exported protocol (`protocol UserRepository: Shared.UserRepository`), lists at most one mirrored parent so the mock subclasses its mock, and restates every other parent's requirements. A `suspend` function is restated once, as `async throws`.

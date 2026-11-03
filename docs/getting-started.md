@@ -65,7 +65,7 @@ This links the debug framework for the simulator matching your Mac and writes `i
 Projects created with the Kotlin Multiplatform wizard build the framework from a "Run Script" build phase of the app target, which runs `embedAndSignAppleFrameworkForXcode`. That task links the framework for the active SDK and architecture, and the plugin generates the mocks right after, so every Xcode build keeps them current.
 
 1. Make sure the build phase runs with `ENABLE_USER_SCRIPT_SANDBOXING = NO`. Kotlin Multiplatform requires it for this phase, and the plugin needs it too, to write into the test target's folder.
-2. Add the `Mockable` library from `https://github.com/yysskk/swift-mockable` (4.0.0 or later) to the test target.
+2. Add the `Mockable` library from `https://github.com/yysskk/swift-mockable` (3.1.0 or later) to the test target.
 3. Add `Generated/SharedMocks.swift` to the test target. With a synchronized folder, Xcode picks it up once it exists; otherwise drag it into the target once.
 4. Ignore the generated folder in version control:
 
@@ -124,7 +124,7 @@ let package = Package(
     name: "App",
     platforms: [.iOS(.v16), .macOS(.v14)],
     dependencies: [
-        .package(url: "https://github.com/yysskk/swift-mockable.git", from: "4.0.0"),
+        .package(url: "https://github.com/yysskk/swift-mockable.git", from: "3.1.0"),
     ],
     targets: [
         .binaryTarget(name: "Shared", path: "../shared/build/XCFrameworks/debug/Shared.xcframework"),

@@ -142,6 +142,22 @@ To release:
    git push origin v1.0.0
    ```
 
+The workflow creates the GitHub release itself. A release drafted by hand for
+the tag is published with its notes replaced by the changelog section.
+
+If a run fails:
+
+- **The job never starts** and is cancelled with "The job was not acquired by
+  Runner": no macOS runner was available. Re-run it.
+- **Signing fails** with `checksum mismatch`: `SIGNING_IN_MEMORY_KEY_PASSWORD`
+  is not the key's passphrase. Set the secret again and re-run.
+- **A step after Maven Central fails**: re-run only after checking that the
+  version did not reach Maven Central, which rejects a version it already has.
+
+The first version of the plugin waits for approval by the Gradle Plugin Portal,
+which can take a few days; later versions are available as soon as they are
+published.
+
 ## Commit and PR conventions
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for commit

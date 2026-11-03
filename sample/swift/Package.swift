@@ -11,8 +11,7 @@ let package = Package(
         .iOS(.v16),
     ],
     dependencies: [
-        // Until a swift-mockable release treats module-qualified parents as conformances.
-        .package(url: "https://github.com/yysskk/swift-mockable.git", branch: "main"),
+        .package(url: "https://github.com/yysskk/swift-mockable.git", from: "3.1.0"),
     ],
     targets: [
         .binaryTarget(

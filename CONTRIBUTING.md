@@ -158,6 +158,16 @@ The first version of the plugin waits for approval by the Gradle Plugin Portal,
 which can take a few days; later versions are available as soon as they are
 published.
 
+If the Plugin Portal cancels a submission, fix what it reports, then publish the
+plugin again from the tag without touching Maven Central: run the
+`Publish Plugin` workflow from the Actions tab, or
+
+```sh
+gh workflow run publish-plugin.yml -f tag=v1.0.0
+```
+
+The Portal accepts the same version again after a cancellation.
+
 ## Commit and PR conventions
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/) for commit

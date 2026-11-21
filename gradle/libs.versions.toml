@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.21"
-ksp = "2.3.13"
+ksp = "2.3.14"
 kotlin-compile-testing = "0.14.0"
 kover = "0.9.11"
 
